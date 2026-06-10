@@ -90,48 +90,6 @@ body {
   line-height: 1.4;
 }
 
-.table-wrap {
-  overflow-x: auto;
-}
-
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.product-table th {
-  text-align: left;
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
-  padding: 0 10px 10px;
-}
-
-.product-table td {
-  padding: 4px 6px;
-}
-
-.col-action {
-  width: 44px;
-  text-align: center;
-}
-
-.product-table input {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 9px 11px;
-  font-size: 14px;
-  background: #fff;
-  transition: border-color 0.15s;
-}
-
-.product-table input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
-}
-
 .table-actions {
   display: flex;
   align-items: center;
@@ -139,6 +97,120 @@ body {
   margin-top: 16px;
 }
 
+/* --- Редактор полей этикетки --- */
+.field-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 10px;
+  background: #fff;
+}
+
+.field-row.barcode {
+  background: #f6f3fe;
+  border-color: #ddd2fb;
+}
+
+.field-move {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.field-move .icon-btn {
+  width: 26px;
+  height: 22px;
+  font-size: 13px;
+}
+
+.field-move .icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.field-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.field-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.field-name,
+.field-value {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 11px;
+  font-size: 14px;
+  background: #fff;
+  min-width: 0;
+}
+
+.field-name {
+  flex: 1 1 130px;
+}
+
+.field-value {
+  flex: 2 1 180px;
+}
+
+.field-name:focus,
+.field-value:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.field-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.field-toggle input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.field-del {
+  width: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+/* --- Кнопки --- */
 .btn {
   border: 1px solid var(--border);
   background: #fff;
@@ -174,20 +246,6 @@ body {
   cursor: not-allowed;
 }
 
-.link-btn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 13.5px;
-  text-decoration: underline;
-  padding: 0;
-}
-
-.link-btn:hover {
-  color: #ef4444;
-}
-
 .icon-btn {
   width: 30px;
   height: 30px;
@@ -206,6 +264,7 @@ body {
   color: #ef4444;
 }
 
+/* --- Настройки --- */
 .settings .field {
   margin-bottom: 18px;
 }
@@ -271,6 +330,7 @@ body {
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
 
+/* --- Генерация --- */
 .generate-bar {
   display: flex;
   align-items: center;
@@ -283,6 +343,7 @@ body {
   font-size: 14px;
 }
 
+/* --- Предпросмотр --- */
 .preview-host {
   border: 1px dashed var(--border);
   border-radius: 10px;
