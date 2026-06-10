@@ -26,8 +26,6 @@ export interface LabelSettings {
   heightMm: number
   fontSize: number
   format: BarcodeFormat
-  /** Сколько одинаковых копий этикетки положить в PDF. */
-  copies: number
 }
 
 export const PRESETS: Record<Exclude<SizePreset, 'custom'>, { widthMm: number; heightMm: number }> = {
