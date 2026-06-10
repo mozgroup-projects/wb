@@ -1,20 +1,18 @@
 import { useMemo, useState } from 'react'
-import type { Row, LabelSettings } from './types'
+import type { LabelItem, LabelSettings } from './types'
 import { PRESETS } from './types'
-import ProductTable from './components/ProductTable'
+import FieldEditor from './components/FieldEditor'
 import LabelSettingsPanel from './components/LabelSettings'
 import LabelPreview from './components/LabelPreview'
 import { generatePdf, isPrintable } from './lib/generatePdf'
 
 let idCounter = 0
-const newId = () => `row-${++idCounter}`
+const newId = () => `f-${++idCounter}`
 
-const emptyRow = (): Row => ({ id: newId(), barcode: '', name: '', article: '' })
-
-const initialRows: Row[] = [
-  { id: newId(), barcode: '2003421249001', name: 'Футболка хлопок, чёрная', article: 'А1301' },
-  { id: newId(), barcode: '2014241011006', name: 'Худи оверсайз, серое', article: 'А1402' },
-  { id: newId(), barcode: '2014240965003', name: 'Носки набор 5 пар', article: 'А1503' },
+const initialItems: LabelItem[] = [
+  { id: newId(), kind: 'text', name: 'Название', value: 'Футболка хлопок, чёрная', showName: false },
+  { id: newId(), kind: 'barcode', name: 'Штрих-код', value: '2003421249001', showName: false },
+  { id: newId(), kind: 'text', name: 'Артикул', value: 'А1301', showName: true },
 ]
 
 const initialSettings: LabelSettings = {
@@ -22,46 +20,52 @@ const initialSettings: LabelSettings = {
   ...PRESETS['58x40'],
   fontSize: 9,
   format: 'EAN13',
+  copies: 1,
 }
 
 export default function App() {
-  const [rows, setRows] = useState<Row[]>(initialRows)
+  const [items, setItems] = useState<LabelItem[]>(initialItems)
   const [settings, setSettings] = useState<LabelSettings>(initialSettings)
 
-  const updateCell = (id: string, field: keyof Omit<Row, 'id'>, value: string) =>
-    setRows((rs) => rs.map((r) => (r.id === id ? { ...r, [field]: value } : r)))
+  const changeItem = (id: string, patch: Partial<LabelItem>) =>
+    setItems((list) => list.map((it) => (it.id === id ? { ...it, ...patch } : it)))
 
-  const addRow = () => setRows((rs) => [...rs, emptyRow()])
+  const addField = () =>
+    setItems((list) => [...list, { id: newId(), kind: 'text', name: '', value: '', showName: true }])
 
-  const removeRow = (id: string) =>
-    setRows((rs) => {
-      const next = rs.filter((r) => r.id !== id)
-      return next.length ? next : [emptyRow()]
+  const removeItem = (id: string) =>
+    setItems((list) => list.filter((it) => it.id !== id))
+
+  const moveItem = (id: string, dir: -1 | 1) =>
+    setItems((list) => {
+      const i = list.findIndex((it) => it.id === id)
+      const j = i + dir
+      if (i < 0 || j < 0 || j >= list.length) return list
+      const next = [...list]
+      ;[next[i], next[j]] = [next[j], next[i]]
+      return next
     })
-
-  const clearTable = () => setRows([emptyRow()])
 
   const patchSettings = (patch: Partial<LabelSettings>) =>
     setSettings((s) => ({ ...s, ...patch }))
 
-  const printableCount = useMemo(() => rows.filter(isPrintable).length, [rows])
-  const previewRow = useMemo(() => rows.find(isPrintable), [rows])
+  const printable = useMemo(() => isPrintable(items), [items])
 
   return (
     <div className="app">
       <header className="app-header">
         <h1>Генератор этикеток для Wildberries</h1>
-        <p className="subtitle">Штрих-код · Название · Артикул → готовый PDF для печати</p>
+        <p className="subtitle">Соберите этикетку из нужных полей и скачайте PDF для печати</p>
       </header>
 
       <main className="layout">
         <div className="col-main">
-          <ProductTable
-            rows={rows}
-            onChange={updateCell}
-            onAdd={addRow}
-            onRemove={removeRow}
-            onClear={clearTable}
+          <FieldEditor
+            items={items}
+            onChange={changeItem}
+            onAddField={addField}
+            onRemove={removeItem}
+            onMove={moveItem}
           />
           <LabelSettingsPanel settings={settings} onChange={patchSettings} />
 
@@ -69,21 +73,23 @@ export default function App() {
             <button
               type="button"
               className="btn primary"
-              onClick={() => generatePdf(rows, settings)}
-              disabled={printableCount === 0}
+              onClick={() => generatePdf(items, settings)}
+              disabled={!printable}
             >
               Скачать PDF ↓
             </button>
             <span className="count">
-              {printableCount > 0
-                ? `Этикеток в PDF: ${printableCount}`
-                : 'Заполните хотя бы одну строку'}
+              {printable
+                ? settings.copies > 1
+                  ? `Копий в PDF: ${settings.copies}`
+                  : 'Одна этикетка в PDF'
+                : 'Заполните хотя бы одно поле'}
             </span>
           </div>
         </div>
 
         <aside className="col-side">
-          <LabelPreview row={previewRow} settings={settings} />
+          <LabelPreview items={items} settings={settings} />
         </aside>
       </main>
 
